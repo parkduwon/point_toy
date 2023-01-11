@@ -1,0 +1,59 @@
+<configuration scan="true" scanPeriod="60 seconds">
+    <!-- log patterns -->
+    <property name="logFile" value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{35} - %msg%n" />
+    <property name="logConsole" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+
+    <property name="type" value="app"/>
+    <property name="moduleId" value="voucher"/>
+    <!-- 로그저장 경로 서버 운영시 변경해줘야 한다 -->
+    <property name="logPath" value="../logs"/>
+
+    <!-- Color Logs -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+
+    <!-- Console Output Settings -->
+    <appender name="LOCAL_CONSOLE_LOG" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${logConsole}</pattern>
+        </encoder>
+    </appender>
+    <!-- LogFile Output Settings -->
+    <appender name="FILE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+        <file>${logPath}/${moduleId}/logback/logback_${type}.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${moduleId}/logback/logback_${type}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${logFile}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Stage Profile    -->
+    <springProfile name="local">
+        <root>
+            <appender-ref ref="LOCAL_CONSOLE_LOG"/>
+        </root>
+    </springProfile>
+    <springProfile name="dev">
+        <root>
+            <appender-ref ref="FILE_LOG"/>
+        </root>
+    </springProfile>
+    <springProfile name="stg">
+        <root>
+            <appender-ref ref="FILE_LOG"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <root>
+            <appender-ref ref="FILE_LOG"/>
+        </root>
+    </springProfile>
+</configuration>
